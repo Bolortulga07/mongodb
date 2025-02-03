@@ -178,4 +178,38 @@ route.get("/lt", async (req, res) => {
 
   res.send(movies);
 });
+
+route.get("/task8", async (req, res) => {
+  let { director, page = 1, limit = 10 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+  const movies = await movies_collection
+    .find({ directors: { $in: [director] } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .sort()
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/sort", async (req, res) => {
+  let { sort = "desc", page = 1, limit = 10 } = req.query;
+
+  const sortQuery = { year: sort === "asc" ? 1 : -1 };
+
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({}, { projection: { title: 1, year: 1, _id: 0 } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .sort(sortQuery)
+    .toArray();
+
+  res.send(movies);
+});
+
 export { route };
