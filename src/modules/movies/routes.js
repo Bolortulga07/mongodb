@@ -212,4 +212,17 @@ route.get("/sort", async (req, res) => {
   res.send(movies);
 });
 
+route.get("/limit", async (req, res) => {
+  let { page = 1, limit = 10 } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+  const movies = await movies_collection
+    .find()
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
 export { route };
