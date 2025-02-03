@@ -238,6 +238,7 @@ route.get("/skip", async (req, res) => {
 
   res.send(movies);
 });
+
 route.get("/paginate", async (req, res) => {
   let { page = 1, paginate = 10, limit = 10 } = req.query;
   page = Number(page);
@@ -246,6 +247,23 @@ route.get("/paginate", async (req, res) => {
   const movies = await movies_collection
     .find()
     .skip((page - 1) * paginate)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/awards", async (req, res) => {
+  let { awards, limit = 10 } = req.query;
+  awards = Number(awards);
+  limit = Number(limit);
+  const movies = await movies_collection
+    .find(
+      {
+        "awards.wins": { $gt: awards },
+      },
+      { projection: { title: 1, awards: 1 } }
+    )
     .limit(limit)
     .toArray();
 
