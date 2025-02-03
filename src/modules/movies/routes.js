@@ -225,4 +225,31 @@ route.get("/limit", async (req, res) => {
   res.send(movies);
 });
 
+route.get("/skip", async (req, res) => {
+  let { page = 1, skip = 10, limit = 10 } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+  skip = Number(skip);
+  const movies = await movies_collection
+    .find()
+    .skip((page - 1) * skip)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+route.get("/paginate", async (req, res) => {
+  let { page = 1, paginate = 10, limit = 10 } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+  paginate = Number(paginate);
+  const movies = await movies_collection
+    .find()
+    .skip((page - 1) * paginate)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
 export { route };
