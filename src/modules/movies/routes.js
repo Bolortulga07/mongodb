@@ -1,5 +1,5 @@
 import express from "express";
-import { client } from "../../../mongo.js";
+import { client } from "../../mongo.js";
 
 const route = express.Router();
 
