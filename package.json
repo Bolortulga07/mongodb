@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Bolortulga07/mongodb.git"
+    "url": "git+https://github.com/Enkhtuvshin0513/mongodb.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Bolortulga07/mongodb/issues"
+    "url": "https://github.com/Enkhtuvshin0513/mongodb/issues"
   },
-  "homepage": "https://github.com/Bolortulga07/mongodb#readme",
+  "homepage": "https://github.com/Enkhtuvshin0513/mongodb#readme",
   "dependencies": {
     "express": "^4.21.2",
     "mongodb": "^6.12.0"

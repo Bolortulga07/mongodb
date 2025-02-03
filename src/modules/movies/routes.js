@@ -134,4 +134,48 @@ route.get("/task4", async (req, res) => {
   res.send(movies);
 });
 
+route.get("/in", async (req, res) => {
+  let { ratings, page = 1, limit = 10 } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+  ratings = Number(ratings);
+
+  const movies = await movies_collection
+    .find({ "imdb.rating": { $in: [ratings] } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/gt", async (req, res) => {
+  let { votesNumber, page = 1, limit = 10 } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+  votesNumber = Number(votesNumber);
+  const movies = await movies_collection
+    .find({
+      "imdb.votes": { $gt: votesNumber },
+    })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/lt", async (req, res) => {
+  let { runTime, page = 1, limit = 10 } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+  runTime = Number(runTime);
+  const movies = await movies_collection
+    .find({ runtime: { $lt: runTime } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
 export { route };
