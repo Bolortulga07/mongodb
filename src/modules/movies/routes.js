@@ -421,4 +421,35 @@ route.get("/imdb-range", async (req, res) => {
   res.send(movies);
 });
 
+route.get("/awards-count", async (req, res) => {
+  let { minWins = 0, page = 1, limit = 10 } = req.query;
+
+  minWins = Number(minWins);
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({ "awards.wins": { $gte: minWins } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/country", async (req, res) => {
+  let { country, page = 1, limit = 10 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({ country: { $in: [country] } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
 export { route };
