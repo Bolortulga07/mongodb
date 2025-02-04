@@ -270,4 +270,34 @@ route.get("/awards", async (req, res) => {
   res.send(movies);
 });
 
+route.get("/language", async (req, res) => {
+  let { language, page = 1, limit = 10 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+  const movies = await movies_collection
+    .find({ language: { $in: [language] } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/fresh", async (req, res) => {
+  let { minFresh = 0, page = 1, limit = 10 } = req.query;
+
+  minFresh = Number(minFresh);
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({ minFresh: { $gt: minFresh } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
 export { route };
