@@ -598,4 +598,26 @@ route.get("/multiLanguages", async (req, res) => {
   res.send(movies);
 });
 
+route.get("/multiDirectors", async (req, res) => {
+  let { director, page = 1, limit = 10 } = req.query;
+  console.log(director);
+  page = Number(page);
+  limit = Number(limit);
+
+  const query = {
+    $or: director.map((directors) => ({ directors })),
+  };
+
+  console.log(query);
+
+  const movies = await movies_collection
+    .find(query)
+    .skip((page - 1) * limit)
+    .sort({ directors: -1 })
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
 export { route };
