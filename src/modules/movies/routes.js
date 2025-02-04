@@ -505,13 +505,92 @@ route.get("/and", async (req, res) => {
   res.send(movies);
 });
 
-route.get("/ratings", async (req, res) => {
+route.get("/multiRatings", async (req, res) => {
   let { ratings, page = 1, limit = 10 } = req.query;
   page = Number(page);
   limit = Number(limit);
 
   const movies = await movies_collection
     .find({ "imdb.rating": { $in: ratings.map((rating) => Number(rating)) } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/multiGenres", async (req, res) => {
+  let { genre, page = 1, limit = 10 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+
+  const query = { $or: genre.map((genres) => ({ genres: genre })) };
+
+  const movies = await movies_collection
+    .find(query)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/multiConditions", async (req, res) => {
+  let { genre, year, rating, page = 1, limit = 10 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+  year = Number(year);
+  rating = Number(rating);
+
+  const query = { $and: [] };
+  if (genre) query.$and.push({ genres: genre });
+  if (year) query.$and.push({ year: year });
+  if (rating) query.$and.push({ "imdb.rating": rating });
+  const movies = await movies_collection
+    .find(query)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/or-and", async (req, res) => {
+  let { genre, year, rating, page = 1, limit = 10 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+  year = Number(year);
+  rating = Number(rating);
+
+  const query = {};
+  if (genre) query.$or = [{ genres: genre }];
+
+  if (year || rating) {
+    query.$and = [];
+    if (year) query.$and.push({ year: year });
+    if (rating) query.$and.push({ "imdb.rating": rating });
+  }
+  const movies = await movies_collection
+    .find(query)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/multiLanguages", async (req, res) => {
+  let { language, page = 1, limit = 10 } = req.query;
+  console.log(language);
+  page = Number(page);
+  limit = Number(limit);
+
+  const query = language ? { languages: { $in: [language] } } : {};
+  const movies = await movies_collection
+    .find(query)
     .skip((page - 1) * limit)
     .limit(limit)
     .toArray();
