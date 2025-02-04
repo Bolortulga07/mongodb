@@ -285,19 +285,76 @@ route.get("/language", async (req, res) => {
 });
 
 route.get("/fresh", async (req, res) => {
-  let { minFresh = 0, page = 1, limit = 10 } = req.query;
+  let { fresh = 0, page = 1, limit = 10 } = req.query;
 
-  minFresh = Number(minFresh);
+  fresh = Number(fresh);
   page = Number(page);
   limit = Number(limit);
 
   const movies = await movies_collection
-    .find({ minFresh: { $gt: minFresh } })
+    .find({ "tomatoes.rating": { $gt: fresh } })
     .skip((page - 1) * limit)
     .limit(limit)
     .toArray();
 
   res.send(movies);
+});
+
+route.get("/filter", async (req, res) => {
+  let { genre, year, page = 1, limit = 10 } = req.query;
+
+  let query = {};
+  if (genre) query.genre = genre;
+  if (year) query.year = Number(year);
+
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find(query)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/cast", async (req, res) => {
+  let { castMember, page = 1, limit = 10 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({ cast: { $in: [castMember] } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/plot", async (req, res) => {
+  let { keyword, page = 1, limit = 10 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({ plot: { $regex: keyword, $options: "i" } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/count", async (req, res) => {
+  let { genre } = req.query;
+
+  const count = await movies_collection.countDocuments({ genre });
+
+  res.send({ genre, count });
 });
 
 export { route };
