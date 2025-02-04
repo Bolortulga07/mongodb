@@ -389,4 +389,36 @@ route.get("/runtime-range", async (req, res) => {
   res.send(movies);
 });
 
+route.get("/release-range", async (req, res) => {
+  let { startDate, endDate, page = 1, limit = 10 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({ releaseDate: { $gte: startDate, $lte: endDate } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/imdb-range", async (req, res) => {
+  let { minRating = 0, maxRating = 10, page = 1, limit = 10 } = req.query;
+
+  minRating = Number(minRating);
+  maxRating = Number(maxRating);
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({ imdbRating: { $gte: minRating, $lte: maxRating } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
 export { route };
