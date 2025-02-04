@@ -357,4 +357,36 @@ route.get("/count", async (req, res) => {
   res.send({ genre, count });
 });
 
+route.get("/noVotes", async (req, res) => {
+  let { page = 1, limit = 10 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({ imdbVotes: { $eq: 0 } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/runtime-range", async (req, res) => {
+  let { minRuntime = 0, maxRuntime = 500, page = 1, limit = 10 } = req.query;
+
+  minRuntime = Number(minRuntime);
+  maxRuntime = Number(maxRuntime);
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({ runtime: { $gte: minRuntime, $lte: maxRuntime } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
 export { route };
