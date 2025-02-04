@@ -467,7 +467,26 @@ route.get("/type", async (req, res) => {
   res.send(movies);
 });
 
-route.get("/genre,year", async (req, res) => {
+route.get("/genre-or-year", async (req, res) => {
+  let { genre, year, page = 1, limit = 10 } = req.query;
+
+  const query = { $or: [] };
+  if (genre) query.$or.push({ genres: genre });
+  if (year) query.$or.push({ year: Number(year) });
+
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find(query.$or.length > 0 ? query : {})
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/and", async (req, res) => {
   let { genre, year, page = 1, limit = 10 } = req.query;
 
   const query = { $and: [] };
@@ -479,6 +498,20 @@ route.get("/genre,year", async (req, res) => {
 
   const movies = await movies_collection
     .find(query.$and.length > 0 ? query : {})
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/ratings", async (req, res) => {
+  let { ratings, page = 1, limit = 10 } = req.query;
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({ "imdb.rating": { $in: ratings.map((rating) => Number(rating)) } })
     .skip((page - 1) * limit)
     .limit(limit)
     .toArray();
