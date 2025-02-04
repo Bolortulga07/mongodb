@@ -444,7 +444,41 @@ route.get("/country", async (req, res) => {
   limit = Number(limit);
 
   const movies = await movies_collection
-    .find({ country: { $in: [country] } })
+    .find({ countries: { $in: [country] } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/type", async (req, res) => {
+  let { type, page = 1, limit = 10 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find({ type: { $eq: [type] } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  res.send(movies);
+});
+
+route.get("/genre,year", async (req, res) => {
+  let { genre, year, page = 1, limit = 10 } = req.query;
+
+  const query = { $and: [] };
+  if (genre) query.$and.push({ genres: genre });
+  if (year) query.$and.push({ year: Number(year) });
+
+  page = Number(page);
+  limit = Number(limit);
+
+  const movies = await movies_collection
+    .find(query.$and.length > 0 ? query : {})
     .skip((page - 1) * limit)
     .limit(limit)
     .toArray();
